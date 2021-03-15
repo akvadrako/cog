@@ -25,8 +25,8 @@ target_link_libraries(cogplatform-drm PRIVATE
     PkgConfig::LibGBM
     PkgConfig::LibInput
     PkgConfig::LibUdev
-    PkgConfig::WEB_ENGINE
     PkgConfig::WaylandServer
+    PkgConfig::WebKit
     PkgConfig::WpeFDO
 )
 
