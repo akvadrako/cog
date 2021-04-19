@@ -443,6 +443,16 @@ resize_window (void)
     int32_t pixel_width = win_data.width * wl_data.current_output.scale;
     int32_t pixel_height = win_data.height * wl_data.current_output.scale;
 
+    wpe_view_backend_dispatch_set_size (wpe_view_data.backend,
+                                        win_data.width,
+                                        win_data.height);
+    g_debug ("Resized EGL buffer to: (%u, %u) @%ix\n",
+            pixel_width, pixel_height, wl_data.current_output.scale);
+}
+
+static void
+apply_minmax_bounds (void)
+{
     rect_t min = win_data.min_rect;
     if (min.w >= 0 && min.h >= 0) {
         g_debug("Configuring min size: %ldx%ld", min.w, min.h);
@@ -462,12 +472,6 @@ resize_window (void)
             g_warning ("No available shell capable of settings max size.");
         }
     }
-
-    wpe_view_backend_dispatch_set_size (wpe_view_data.backend,
-                                        win_data.width,
-                                        win_data.height);
-    g_debug ("Resized EGL buffer to: (%u, %u) @%ix\n",
-            pixel_width, pixel_height, wl_data.current_output.scale);
 }
 
 static void
@@ -700,9 +704,10 @@ surface_handle_enter (void *data, struct wl_surface *surface, struct wl_output *
         return;
     }
     g_debug ("Surface entered output %p with scale factor %i\n", output, scale_factor);
+    wl_data.current_output.scale = scale_factor;
+    resize_window ();
     wl_surface_set_buffer_scale (surface, scale_factor);
     wpe_view_backend_dispatch_set_device_scale_factor (wpe_view_data.backend, scale_factor);
-    wl_data.current_output.scale = scale_factor;
 #endif /* HAVE_DEVICE_SCALING */
 }
 
@@ -2145,6 +2150,7 @@ create_window (GError **error)
         xdg_toplevel_add_listener (win_data.xdg_toplevel,
                                    &xdg_toplevel_listener, NULL);
         xdg_toplevel_set_title (win_data.xdg_toplevel, COG_DEFAULT_APPNAME);
+        apply_minmax_bounds ();
 
         const char *app_id = NULL;
         GApplication *app = g_application_get_default ();
@@ -2580,6 +2586,7 @@ cog_platform_plugin_resize (CogPlatform   *platform,
             &win_data.max_rect.h);
 
     configure_surface_geometry (0, 0);
+    apply_minmax_bounds ();
     resize_window ();
 }
 

@@ -438,6 +438,7 @@ on_create_view (CogShell *shell, void *user_data G_GNUC_UNUSED)
     cog_web_view_connect_default_progress_handlers (web_view);
     cog_web_view_connect_default_error_handlers (web_view);
 
+    g_message("trace %s %s", __func__, "load_uri");
     webkit_web_view_load_uri (web_view, s_options.home_uri);
     g_clear_pointer (&s_options.home_uri, g_free);
 
@@ -468,6 +469,7 @@ main (int argc, char *argv[])
         g_set_prgname (dir_separator ? dir_separator + 1 : argv[0]);
         g_set_application_name ("Cog");
     }
+    g_message("trace %s", __func__);
 
     g_autoptr(GApplication) app = G_APPLICATION (cog_launcher_get_default ());
     g_application_add_main_option_entries (app, s_cli_options);

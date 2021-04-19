@@ -69,6 +69,10 @@ on_file_read_async_completed (GObject      *source_object,
             g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE);
         const char *mime_type =
             g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE);
+       
+        g_debug("read file %s size:%ld type:%s",
+                g_file_get_path(file), (long)size, mime_type);
+
         webkit_uri_scheme_request_finish (request, stream, size, mime_type);
     } else {
         /*
